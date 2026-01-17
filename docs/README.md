@@ -238,6 +238,10 @@ RageBreak/
 
 Free to use and modify. Built as a productivity tool for healthier browsing habits.
 
+## Attribution
+
+Icon artwork generated with Google Gemini.
+
 ## Support
 
 For issues or suggestions, please check the extension's error console:
