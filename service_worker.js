@@ -1,10 +1,12 @@
 // Service Worker for RageScroll Extension
 // Manages timing, state, and communication between popup and content scripts
 
+console.log('RageScroll Service Worker: LOADED');
+
 // Default settings
 const DEFAULT_SETTINGS = {
   enabled: true,
-  breakInterval: 5, // minutes
+  breakInterval: 10, // seconds
   activeDomains: ['*'], // '*' means all domains
   lastBreakTime: 0,
   activityStartTime: 0,
@@ -71,7 +73,7 @@ async function handleActivityDetected(tabId) {
   
   // Check if it's time for a break
   const timeSinceLastBreak = now - (settings.lastBreakTime || now);
-  const breakIntervalMs = settings.breakInterval * 60 * 1000;
+  const breakIntervalMs = settings.breakInterval * 1000;
   
   console.log('RageScroll: Activity check -', {
     timeSinceLastBreak: Math.floor(timeSinceLastBreak / 1000) + 's',
@@ -85,6 +87,10 @@ async function handleActivityDetected(tabId) {
     try {
       await chrome.tabs.sendMessage(tabId, { type: 'SHOW_BREAK' });
       console.log('RageScroll: Break message sent successfully');
+      
+      // Reset the break timer
+      await chrome.storage.sync.set({ lastBreakTime: now });
+      console.log('RageScroll: Break timer reset');
     } catch (error) {
       console.error('RageScroll: Error sending break message:', error);
     }
@@ -108,7 +114,7 @@ async function checkShouldShowBreak(url) {
   
   const now = Date.now();
   const timeSinceLastBreak = now - (settings.lastBreakTime || 0);
-  const breakIntervalMs = settings.breakInterval * 60 * 1000;
+  const breakIntervalMs = settings.breakInterval * 1000;
   
   return { 
     shouldShow: timeSinceLastBreak >= breakIntervalMs,
@@ -131,7 +137,7 @@ async function getTimeRemaining() {
   const now = Date.now();
   const lastBreakTime = settings.lastBreakTime || now;
   const activityStartTime = settings.activityStartTime || now;
-  const breakIntervalMs = settings.breakInterval * 60 * 1000;
+  const breakIntervalMs = settings.breakInterval * 1000;
   
   // If no activity has been recorded yet
   if (!settings.activityStartTime || settings.activityStartTime === 0) {

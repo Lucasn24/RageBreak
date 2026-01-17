@@ -15,7 +15,7 @@ let currentDomains = [];
 async function loadSettings() {
   const settings = await chrome.storage.sync.get({
     enabled: true,
-    breakInterval: 5,
+    breakInterval: 10,
     activeDomains: ['*']
   });
 
@@ -107,8 +107,8 @@ async function saveSettings() {
   };
   
   // Validate
-  if (settings.breakInterval < 1 || settings.breakInterval > 120) {
-    showStatus('Break interval must be between 1 and 120 minutes', 'error');
+  if (settings.breakInterval < 10 || settings.breakInterval > 7200) {
+    showStatus('Break interval must be between 10 seconds and 2 hours', 'error');
     return;
   }
   

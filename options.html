@@ -29,7 +29,7 @@
 
         <div class="setting-group">
           <label class="setting-label" for="break-interval">
-            Break Interval (minutes)
+            Break Interval (seconds)
           </label>
           <p class="setting-description">
             How often you'll be prompted to take a break
@@ -38,12 +38,12 @@
             <input 
               type="number" 
               id="break-interval" 
-              min="1" 
-              max="120" 
-              value="5"
+              min="10" 
+              max="7200" 
+              value="10"
               class="input-number"
             >
-            <span class="input-suffix">minutes</span>
+            <span class="input-suffix">seconds</span>
           </div>
         </div>
       </section>

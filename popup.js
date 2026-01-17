@@ -54,9 +54,20 @@ async function updateCountdown() {
       countdownEl.textContent = 'Ready!';
       statusIconEl.textContent = '🎮';
     } else {
-      const minutes = Math.floor(timeRemaining / 60000);
-      const seconds = Math.floor((timeRemaining % 60000) / 1000);
-      countdownEl.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+      const totalSeconds = Math.floor(timeRemaining / 1000);
+      const minutes = Math.floor(totalSeconds / 60);
+      const seconds = totalSeconds % 60;
+      
+      // Show format based on time remaining
+      if (totalSeconds < 60) {
+        countdownEl.textContent = `${seconds}s`;
+      } else if (totalSeconds < 3600) {
+        countdownEl.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+      } else {
+        const hours = Math.floor(minutes / 60);
+        const mins = minutes % 60;
+        countdownEl.textContent = `${hours}:${mins.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+      }
       statusIconEl.textContent = '⏱️';
     }
   } catch (error) {

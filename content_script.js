@@ -1,6 +1,8 @@
 // Content Script for RageScroll
 // Tracks user activity and displays overlay when needed
 
+console.log('RageScroll Content Script: LOADED');
+
 let activityTimeout;
 let overlayShown = false;
 let activityDetected = false;
@@ -16,6 +18,7 @@ function trackActivity() {
   if (overlayShown) return;
   
   activityDetected = true;
+  console.log('RageScroll Content: Activity detected');
   throttledActivityDetection();
 }
 
@@ -103,8 +106,23 @@ function showBreakOverlay() {
     });
   });
   
+  // Append overlay to document
+  console.log('RageScroll: About to append overlay to body');
+  console.log('RageScroll: document.body:', document.body);
+  console.log('RageScroll: overlay element:', overlay);
+  
+  document.body.appendChild(overlay);
+  console.log('RageScroll: Overlay appended to document body');
+  
+  // Check if overlay is in the DOM
+  const checkOverlay = document.getElementById('ragescroll-overlay');
+  console.log('RageScroll: Overlay found in DOM:', checkOverlay);
+  console.log('RageScroll: Overlay computed style display:', window.getComputedStyle(checkOverlay).display);
+  console.log('RageScroll: Overlay computed style visibility:', window.getComputedStyle(checkOverlay).visibility);
+  
   // Prevent scrolling on body
   document.body.style.overflow = 'hidden';
+  console.log('RageScroll: Body overflow set to hidden');
 }
 
 // Start selected game
