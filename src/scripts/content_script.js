@@ -13,6 +13,7 @@ let warningIntervalId = null;
 let webcamStream = null;
 let webcamAutoRepActive = false;
 let webcamAutoRepRafId = null;
+let audioUnlocked = false;
 
 function safeSendMessage(message) {
   if (!chrome.runtime?.id) {
@@ -41,8 +42,24 @@ function trackActivity() {
   if (overlayShown) return;
 
   activityDetected = true;
+  unlockAudioContext();
   console.log("RageBreak Content: Activity detected");
   throttledActivityDetection();
+}
+
+function unlockAudioContext() {
+  if (audioUnlocked) return;
+  try {
+    alarmAudioContext =
+      alarmAudioContext ||
+      new (window.AudioContext || window.webkitAudioContext)();
+    if (alarmAudioContext.state === "suspended") {
+      alarmAudioContext.resume();
+    }
+    audioUnlocked = true;
+  } catch (error) {
+    // Ignore audio unlock errors
+  }
 }
 
 // Add event listeners for activity tracking
@@ -97,7 +114,7 @@ function showBreakOverlay() {
   overlayShown = true;
 
   // Randomly select a game
-  const games = ["wordle", "sudoku", "memory", "snake", "math", "webcam"];
+  const games = ["wordle", "sudoku", "memory", "snake", "math", "webcam", "2048"];
   const randomGame = games[Math.floor(Math.random() * games.length)];
   console.log("RageBreak: Randomly selected game:", randomGame);
 
@@ -154,6 +171,19 @@ function showBreakOverlay() {
   startAlarmSound();
   startFlyingStuff(overlay);
   startAnnoyances(overlay);
+  
+  // Add click listener to resume audio on any user interaction
+  const resumeAudio = () => {
+    if (alarmAudioContext && alarmAudioContext.state === 'suspended') {
+      alarmAudioContext.resume().then(() => {
+        console.log('RageBreak: Audio context resumed after user interaction');
+      }).catch(() => {});
+    }
+    overlay.removeEventListener('click', resumeAudio);
+    document.removeEventListener('keydown', resumeAudio);
+  };
+  overlay.addEventListener('click', resumeAudio);
+  document.addEventListener('keydown', resumeAudio);
 
   // Start the randomly selected game immediately
   const container = document.getElementById("ragebreak-game-container");
@@ -178,11 +208,16 @@ function startGame(gameType, container) {
     initSnake(container);
   } else if (gameType === "math") {
     initMath(container);
+  } else if (gameType === "2048") {
+    init2048(container);
   }
 }
 
 // Close overlay and notify service worker
 async function closeOverlay(gameType) {
+  if (gameType) {
+    showCelebration(gameType);
+  }
   const overlay = document.getElementById("ragebreak-overlay");
   if (overlay) {
     overlay.remove();
@@ -203,6 +238,101 @@ async function closeOverlay(gameType) {
 
   // Notify service worker that break is completed
   safeSendMessage({ type: "BREAK_COMPLETED" });
+}
+
+function showCelebration(gameType) {
+  playCelebrationSound();
+  const celebration = document.createElement("div");
+  celebration.className = "ragebreak-celebration";
+  celebration.innerHTML = `
+    <div class="celebration-card">
+      <div class="celebration-title">🎉 Break Complete!</div>
+      <div class="celebration-subtitle">Nice work finishing ${gameType}.</div>
+    </div>
+  `;
+  document.body.appendChild(celebration);
+
+  const floaters = ["🎊", "✨", "🎉", "💫", "🥳", "⭐", "🎈"];
+  for (let i = 0; i < 16; i += 1) {
+    const floater = document.createElement("div");
+    floater.className = "celebration-floater";
+    floater.textContent = floaters[i % floaters.length];
+    floater.style.left = `${Math.random() * 100}%`;
+    floater.style.animationDelay = `${Math.random() * 0.4}s`;
+    floater.style.fontSize = `${18 + Math.random() * 20}px`;
+    celebration.appendChild(floater);
+  }
+
+  setTimeout(() => {
+    celebration.remove();
+  }, 1400);
+}
+
+function playCelebrationSound() {
+  try {
+    const audioUrl = chrome.runtime.getURL("assets/yay-6326.mp3");
+    const audio = new Audio(audioUrl);
+    audio.volume = 0.8;
+    audio.play().catch(() => {
+      const audioCtx =
+        alarmAudioContext ||
+        new (window.AudioContext || window.webkitAudioContext)();
+      alarmAudioContext = audioCtx;
+      if (audioCtx.state === "suspended") {
+        audioCtx.resume();
+      }
+
+      const now = audioCtx.currentTime;
+      const master = audioCtx.createGain();
+      master.gain.setValueAtTime(0.001, now);
+      master.gain.exponentialRampToValueAtTime(0.22, now + 0.03);
+      master.gain.exponentialRampToValueAtTime(0.0001, now + 1.6);
+      master.connect(audioCtx.destination);
+
+      const source = audioCtx.createOscillator();
+      source.type = "sawtooth";
+      source.frequency.setValueAtTime(220, now);
+      source.frequency.exponentialRampToValueAtTime(330, now + 0.25);
+      source.frequency.exponentialRampToValueAtTime(440, now + 0.7);
+
+      const formantA = audioCtx.createBiquadFilter();
+      formantA.type = "bandpass";
+      formantA.frequency.setValueAtTime(700, now);
+      formantA.Q.value = 9;
+
+      const formantB = audioCtx.createBiquadFilter();
+      formantB.type = "bandpass";
+      formantB.frequency.setValueAtTime(1200, now);
+      formantB.Q.value = 10;
+
+      const formantC = audioCtx.createBiquadFilter();
+      formantC.type = "bandpass";
+      formantC.frequency.setValueAtTime(2600, now);
+      formantC.Q.value = 12;
+
+      const mixA = audioCtx.createGain();
+      const mixB = audioCtx.createGain();
+      const mixC = audioCtx.createGain();
+      mixA.gain.value = 0.6;
+      mixB.gain.value = 0.5;
+      mixC.gain.value = 0.3;
+
+      source.connect(formantA);
+      source.connect(formantB);
+      source.connect(formantC);
+      formantA.connect(mixA);
+      formantB.connect(mixB);
+      formantC.connect(mixC);
+      mixA.connect(master);
+      mixB.connect(master);
+      mixC.connect(master);
+
+      source.start(now);
+      source.stop(now + 1.6);
+    });
+  } catch (error) {
+    console.warn("RageBreak: Unable to play celebration sound", error);
+  }
 }
 
 function stopWebcamStream() {
@@ -325,14 +455,25 @@ function stopFlyingStuff() {
   }
 }
 
-function startAlarmSound() {
+async function startAlarmSound() {
   if (alarmIntervalId) return;
   try {
     alarmAudioContext =
       alarmAudioContext ||
       new (window.AudioContext || window.webkitAudioContext)();
+    
+    // Resume AudioContext if suspended (required for autoplay policy)
+    if (alarmAudioContext.state === 'suspended') {
+      await alarmAudioContext.resume();
+    }
+    
     let toggle = false;
     const beep = () => {
+      // Check if context is running before playing
+      if (alarmAudioContext.state !== 'running') {
+        alarmAudioContext.resume().catch(() => {});
+      }
+      
       toggle = !toggle;
       const oscillator = alarmAudioContext.createOscillator();
       const gainNode = alarmAudioContext.createGain();
@@ -372,7 +513,15 @@ async function recordStats(gameType) {
     const result = await chrome.storage.local.get("ragebreak_stats");
     const stats = result.ragebreak_stats || {
       totalBreaks: 0,
-      gamesPlayed: { wordle: 0, sudoku: 0, memory: 0, snake: 0, math: 0, webcam: 0 },
+      gamesPlayed: {
+        wordle: 0,
+        sudoku: 0,
+        memory: 0,
+        snake: 0,
+        math: 0,
+        webcam: 0,
+        "2048": 0,
+      },
       currentStreak: 0,
       longestStreak: 0,
       lastBreakDate: null,

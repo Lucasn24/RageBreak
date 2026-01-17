@@ -31,6 +31,7 @@
         "src/scripts/games/snake.js",
         "src/scripts/games/math.js",
         "src/scripts/games/webcam-overlay.js",
+        "src/scripts/games/2048.js",
         "src/scripts/content_script.js",
         "src/scripts/notification.js"
       ],
@@ -47,6 +48,12 @@
     }
   },
   "options_page": "src/pages/options.html",
+  "web_accessible_resources": [
+    {
+      "resources": ["assets/yay-6326.mp3"],
+      "matches": ["<all_urls>"]
+    }
+  ],
   "commands": {
     "toggle-extension": {
       "suggested_key": {
