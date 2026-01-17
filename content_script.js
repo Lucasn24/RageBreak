@@ -8,6 +8,7 @@ let overlayShown = false;
 let activityDetected = false;
 let alarmAudioContext = null;
 let alarmIntervalId = null;
+let flyIntervalId = null;
 
 // Throttle activity detection to avoid spamming service worker
 const throttledActivityDetection = throttle(() => {
@@ -117,6 +118,7 @@ function showBreakOverlay() {
   console.log('RageScroll: Body overflow set to hidden');
 
   startAlarmSound();
+  startFlyingStuff(overlay);
   
   // Start the randomly selected game immediately
   const container = document.getElementById('ragescroll-game-container');
@@ -477,6 +479,7 @@ async function closeOverlay(gameType) {
   document.body.style.overflow = '';
 
   stopAlarmSound();
+  stopFlyingStuff();
   
   // Record stats
   if (gameType) {
@@ -485,6 +488,46 @@ async function closeOverlay(gameType) {
   
   // Notify service worker that break is completed
   chrome.runtime.sendMessage({ type: 'BREAK_COMPLETED' });
+}
+
+function startFlyingStuff(overlay) {
+  if (flyIntervalId) return;
+  const layer = document.createElement('div');
+  layer.className = 'ragescroll-fly-layer';
+  layer.dataset.ragescrollFlyLayer = 'true';
+  overlay.appendChild(layer);
+
+  const items = ['💥', '⚡', '🚨', '🔊', '💣', '👾', '🌀', '🔥', '😵', '💫', '🔔'];
+
+  const spawn = () => {
+    const item = document.createElement('div');
+    item.className = 'ragescroll-fly-item';
+    item.textContent = items[Math.floor(Math.random() * items.length)];
+    const size = Math.floor(Math.random() * 28) + 20;
+    const top = Math.floor(Math.random() * 80) + 5;
+    const duration = Math.floor(Math.random() * 6) + 6;
+    item.style.fontSize = `${size}px`;
+    item.style.top = `${top}%`;
+    item.style.animationDuration = `${duration}s`;
+    layer.appendChild(item);
+    item.addEventListener('animationend', () => {
+      item.remove();
+    });
+  };
+
+  spawn();
+  flyIntervalId = setInterval(spawn, 700);
+}
+
+function stopFlyingStuff() {
+  if (flyIntervalId) {
+    clearInterval(flyIntervalId);
+    flyIntervalId = null;
+  }
+  const layer = document.querySelector('[data-ragescroll-fly-layer="true"]');
+  if (layer) {
+    layer.remove();
+  }
 }
 
 function startAlarmSound() {

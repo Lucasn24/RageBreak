@@ -31,6 +31,31 @@
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
 }
 
+.ragescroll-fly-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.ragescroll-fly-item {
+  position: absolute;
+  left: -20%;
+  opacity: 0.9;
+  animation-name: flyAcross;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+@keyframes flyAcross {
+  0% {
+    transform: translateX(-20%) rotate(0deg);
+  }
+  100% {
+    transform: translateX(140vw) rotate(720deg);
+  }
+}
+
 .ragescroll-header {
   text-align: center;
   margin-bottom: 30px;
