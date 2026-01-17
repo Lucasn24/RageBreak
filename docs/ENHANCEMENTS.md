@@ -1,4 +1,4 @@
-# 🎮 RageScroll Extension - Enhancement Summary
+# 🎮 RageBreak Extension - Enhancement Summary
 
 ## 🆕 New Features Added
 
@@ -88,7 +88,7 @@
 ## 📊 Complete File Structure
 
 ```
-RageScroll/
+RageBreak/
 ├── manifest.json
 ├── src/
 │   ├── scripts/
@@ -219,7 +219,7 @@ Statistics reset button available on stats page.
 
 ## 🎉 Summary
 
-The RageScroll extension has been significantly enhanced with:
+The RageBreak extension has been significantly enhanced with:
 
 - **3 mini-games** (was 2)
 - **Full statistics tracking** with 9 achievements

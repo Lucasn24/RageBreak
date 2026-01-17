@@ -1,7 +1,7 @@
-// Service Worker for RageScroll Extension
+// Service Worker for RageBreak Extension
 // Manages timing, state, and communication between popup and content scripts
 
-console.log("RageScroll Service Worker: LOADED");
+console.log("RageBreak Service Worker: LOADED");
 
 // Default settings
 const DEFAULT_SETTINGS = {
@@ -16,10 +16,10 @@ const DEFAULT_SETTINGS = {
 
 // Initialize extension on install
 chrome.runtime.onInstalled.addListener(async () => {
-  console.log("RageScroll: Extension installed/updated");
+  console.log("RageBreak: Extension installed/updated");
   const settings = await chrome.storage.sync.get(DEFAULT_SETTINGS);
   if (!settings.breakInterval) {
-    console.log("RageScroll: Initializing default settings");
+    console.log("RageBreak: Initializing default settings");
     const now = Date.now();
     await chrome.storage.sync.set({
       ...DEFAULT_SETTINGS,
@@ -32,7 +32,7 @@ chrome.runtime.onInstalled.addListener(async () => {
 
 // Listen for messages from content scripts and popup
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  console.log("RageScroll: Received message:", message.type);
+  console.log("RageBreak: Received message:", message.type);
 
   if (message.type === "ACTIVITY_DETECTED") {
     handleActivityDetected(sender.tab.id);
@@ -41,7 +41,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true;
   } else if (message.type === "GET_TIME_REMAINING") {
     getTimeRemaining().then((response) => {
-      console.log("RageScroll: Sending time remaining:", response);
+      console.log("RageBreak: Sending time remaining:", response);
       sendResponse(response);
     });
     return true; // Async response
@@ -61,7 +61,7 @@ async function handleActivityDetected(tabId) {
   const settings = await chrome.storage.sync.get(DEFAULT_SETTINGS);
 
   if (!settings.enabled) {
-    console.log("RageScroll: Extension disabled, ignoring activity");
+    console.log("RageBreak: Extension disabled, ignoring activity");
     return;
   }
 
@@ -69,7 +69,7 @@ async function handleActivityDetected(tabId) {
 
   // Initialize activity start time if not set
   if (!settings.activityStartTime || settings.activityStartTime === 0) {
-    console.log("RageScroll: First activity detected, starting timer");
+    console.log("RageBreak: First activity detected, starting timer");
     await chrome.storage.sync.set({
       activityStartTime: now,
       lastBreakTime: now,
@@ -85,7 +85,7 @@ async function handleActivityDetected(tabId) {
   const timeSinceLastBreak = now - (settings.lastBreakTime || now);
   const breakIntervalMs = settings.breakInterval * 1000;
 
-  console.log("RageScroll: Activity check -", {
+  console.log("RageBreak: Activity check -", {
     timeSinceLastBreak: Math.floor(timeSinceLastBreak / 1000) + "s",
     breakInterval: Math.floor(breakIntervalMs / 1000) + "s",
     shouldBreak: timeSinceLastBreak >= breakIntervalMs,
@@ -93,16 +93,16 @@ async function handleActivityDetected(tabId) {
 
   if (timeSinceLastBreak >= breakIntervalMs) {
     // Trigger break
-    console.log("RageScroll: Triggering break for tab", tabId);
+    console.log("RageBreak: Triggering break for tab", tabId);
     try {
       await chrome.tabs.sendMessage(tabId, { type: "SHOW_BREAK" });
-      console.log("RageScroll: Break message sent successfully");
+      console.log("RageBreak: Break message sent successfully");
 
       // Reset the break timer
       await chrome.storage.sync.set({ lastBreakTime: now });
-      console.log("RageScroll: Break timer reset");
+      console.log("RageBreak: Break timer reset");
     } catch (error) {
-      console.error("RageScroll: Error sending break message:", error);
+      console.error("RageBreak: Error sending break message:", error);
     }
   }
 }

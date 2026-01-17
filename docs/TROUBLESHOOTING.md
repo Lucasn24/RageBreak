@@ -5,14 +5,14 @@
 ### 1. **Reload the Extension**
 
 1. Open `chrome://extensions/`
-2. Find **RageScroll**
+2. Find **RageBreak**
 3. Click the **circular reload icon** 🔄
 4. Try clicking the extension icon again
 
 ### 2. **Check Extension is Enabled**
 
 1. Go to `chrome://extensions/`
-2. Find **RageScroll**
+2. Find **RageBreak**
 3. Make sure the toggle switch is **blue/enabled**
 4. If disabled, toggle it on
 
@@ -20,7 +20,7 @@
 
 1. Open `chrome://extensions/`
 2. Enable "Developer mode" (top-right toggle)
-3. Find **RageScroll**
+3. Find **RageBreak**
 4. Look for red "Errors" button
 5. If present, click it to see error details
 6. **Screenshot the error** and we can fix it
@@ -30,14 +30,14 @@
 The icon might be hidden:
 
 1. Click the **puzzle piece icon** 🧩 in Chrome toolbar (top-right)
-2. Find **RageScroll** in the list
+2. Find **RageBreak** in the list
 3. Click the **pin icon** 📌 next to it
 4. The extension icon should appear in your toolbar
 
 ### 5. **Check Service Worker**
 
 1. Open `chrome://extensions/`
-2. Find **RageScroll**
+2. Find **RageBreak**
 3. Click on "service worker" link (if visible)
 4. Check console for errors
 5. Look for any red error messages
@@ -47,7 +47,7 @@ The icon might be hidden:
 Run this in terminal to check files exist:
 
 ```bash
-cd /Users/zhuanghong/Desktop/RageScroll
+cd /Users/zhuanghong/Desktop/RageBreak
 ls -la src/pages/popup.html src/scripts/popup.js src/styles/popup.css
 ```
 
@@ -60,7 +60,7 @@ All three files should exist.
 **Fix:** Check manifest.json syntax
 
 ```bash
-cd /Users/zhuanghong/Desktop/RageScroll
+cd /Users/zhuanghong/Desktop/RageBreak
 python3 -m json.tool manifest.json
 ```
 
@@ -80,7 +80,7 @@ If this shows an error, the JSON is invalid.
 
 1. Go to `chrome://extensions/`
 2. Click "Load unpacked" again
-3. Select the RageScroll folder
+3. Select the RageBreak folder
 
 ### Issue: "Works in one browser, not another"
 
@@ -110,7 +110,7 @@ To test if the popup mechanism works, temporarily use the test popup:
 
 Open the popup HTML directly:
 
-1. Navigate to: `file:///Users/zhuanghong/Desktop/RageScroll/src/pages/popup.html`
+1. Navigate to: `file:///Users/zhuanghong/Desktop/RageBreak/src/pages/popup.html`
 2. Open browser console (F12)
 3. Look for JavaScript errors
 4. Note: Chrome APIs won't work outside extension context, but you'll see if HTML/CSS loads
@@ -118,7 +118,7 @@ Open the popup HTML directly:
 ## Check Chrome Permissions
 
 1. Go to `chrome://extensions/`
-2. Click "Details" on RageScroll
+2. Click "Details" on RageBreak
 3. Scroll to "Permissions"
 4. Should show:
    - Read and change your data on all sites
@@ -130,7 +130,7 @@ Open the popup HTML directly:
 ### Get Diagnostic Info:
 
 ```bash
-cd /Users/zhuanghong/Desktop/RageScroll
+cd /Users/zhuanghong/Desktop/RageBreak
 
 # Check all files exist
 echo "=== Files Check ==="
@@ -158,11 +158,11 @@ ls -lh src/pages/popup.html src/scripts/popup.js src/styles/popup.css
 If nothing works, try a fresh install:
 
 ```bash
-cd /Users/zhuanghong/Desktop/RageScroll
+cd /Users/zhuanghong/Desktop/RageBreak
 
 # In Chrome:
 # 1. Go to chrome://extensions/
-# 2. Remove RageScroll extension
+# 2. Remove RageBreak extension
 # 3. Load it again with "Load unpacked"
 ```
 
@@ -175,7 +175,7 @@ cd /Users/zhuanghong/Desktop/RageScroll
    - Solution: Check service worker console for errors
 
 3. **Icon not pinned/visible**
-   - Solution: Click puzzle icon and pin RageScroll
+   - Solution: Click puzzle icon and pin RageBreak
 
 4. **JavaScript error in popup.js**
    - Solution: Right-click icon → Inspect popup → Check console

@@ -1,8 +1,8 @@
-# 🎮 RageScroll Extension - Complete Package
+# 🎮 RageBreak Extension - Complete Package
 
 ## ✨ What's Included
 
-Your **RageScroll** Chrome Extension is now feature-complete with significant enhancements beyond the original MVP!
+Your **RageBreak** Chrome Extension is now feature-complete with significant enhancements beyond the original MVP!
 
 ### 🎯 Original Requirements ✅
 
@@ -167,7 +167,7 @@ Your **RageScroll** Chrome Extension is now feature-complete with significant en
 1. Open `chrome://extensions/`
 2. Enable "Developer mode"
 3. Click "Load unpacked"
-4. Select `RageScroll` folder
+4. Select `RageBreak` folder
 
 ### Quick Test
 

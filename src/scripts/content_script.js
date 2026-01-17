@@ -1,7 +1,7 @@
-// Content Script for RageScroll
+// Content Script for RageBreak
 // Tracks user activity and displays overlay when needed
 
-console.log("RageScroll Content Script: LOADED");
+console.log("RageBreak Content Script: LOADED");
 
 let activityTimeout;
 let overlayShown = false;
@@ -32,7 +32,7 @@ function safeSendMessage(message) {
 
 // Throttle activity detection to avoid spamming service worker
 const throttledActivityDetection = throttle(() => {
-  console.log("RageScroll: Sending activity detected");
+  console.log("RageBreak: Sending activity detected");
   safeSendMessage({ type: "ACTIVITY_DETECTED" });
 }, 5000); // Send activity update every 5 seconds max
 
@@ -41,7 +41,7 @@ function trackActivity() {
   if (overlayShown) return;
 
   activityDetected = true;
-  console.log("RageScroll Content: Activity detected");
+  console.log("RageBreak Content: Activity detected");
   throttledActivityDetection();
 }
 
@@ -55,14 +55,14 @@ document.addEventListener("mousemove", throttle(trackActivity, 2000), {
 
 // Listen for messages from service worker
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  console.log("RageScroll Content: Received message:", message.type);
+  console.log("RageBreak Content: Received message:", message.type);
 
   if (message.type === "SHOW_BREAK") {
-    console.log("RageScroll Content: Showing break overlay");
+    console.log("RageBreak Content: Showing break overlay");
     if (!overlayShown) {
       showBreakOverlay();
     } else {
-      console.log("RageScroll Content: Overlay already shown");
+      console.log("RageBreak Content: Overlay already shown");
     }
   } else if (message.type === "CLOSE_OVERLAY") {
     if (overlayShown) {
@@ -82,36 +82,36 @@ async function checkInitialBreak() {
       showBreakOverlay();
     }
   } catch (error) {
-    console.error("RageScroll: Error checking initial break:", error);
+    console.error("RageBreak: Error checking initial break:", error);
   }
 }
 
 // Show the break overlay
 function showBreakOverlay() {
   if (overlayShown) {
-    console.log("RageScroll: Overlay already shown, skipping");
+    console.log("RageBreak: Overlay already shown, skipping");
     return;
   }
 
-  console.log("RageScroll: Creating break overlay");
+  console.log("RageBreak: Creating break overlay");
   overlayShown = true;
 
   // Randomly select a game
   const games = ["wordle", "sudoku", "memory", "snake", "math", "webcam"];
   const randomGame = games[Math.floor(Math.random() * games.length)];
-  console.log("RageScroll: Randomly selected game:", randomGame);
+  console.log("RageBreak: Randomly selected game:", randomGame);
 
   // Create overlay container
   const overlay = document.createElement("div");
-  overlay.id = "ragescroll-overlay";
-  overlay.className = "ragescroll-overlay";
+  overlay.id = "ragebreak-overlay";
+  overlay.className = "ragebreak-overlay";
   overlay.classList.add("annoying", "shake");
 
   // Create overlay content (without game selector)
   overlay.innerHTML = `
-    <div class="ragescroll-content">
-      <div class="ragescroll-header">
-        <div class="ragescroll-siren">Solve now!</div>
+    <div class="ragebreak-content">
+      <div class="ragebreak-header">
+        <div class="ragebreak-siren">Solve now!</div>
         <h1>Still Scrolling?</h1>
         <h3>
             You've been here long enough.<br/>
@@ -122,48 +122,48 @@ function showBreakOverlay() {
         </p>
       </div>
       
-      <div id="ragescroll-game-container"></div>
+      <div id="ragebreak-game-container"></div>
     </div>
   `;
-  console.log("RageScroll: Overlay added to page");
+  console.log("RageBreak: Overlay added to page");
 
   // Append overlay to document
-  console.log("RageScroll: About to append overlay to body");
-  console.log("RageScroll: document.body:", document.body);
-  console.log("RageScroll: overlay element:", overlay);
+  console.log("RageBreak: About to append overlay to body");
+  console.log("RageBreak: document.body:", document.body);
+  console.log("RageBreak: overlay element:", overlay);
 
   document.body.appendChild(overlay);
-  console.log("RageScroll: Overlay appended to document body");
+  console.log("RageBreak: Overlay appended to document body");
 
   // Check if overlay is in the DOM
-  const checkOverlay = document.getElementById("ragescroll-overlay");
-  console.log("RageScroll: Overlay found in DOM:", checkOverlay);
+  const checkOverlay = document.getElementById("ragebreak-overlay");
+  console.log("RageBreak: Overlay found in DOM:", checkOverlay);
   console.log(
-    "RageScroll: Overlay computed style display:",
+    "RageBreak: Overlay computed style display:",
     window.getComputedStyle(checkOverlay).display,
   );
   console.log(
-    "RageScroll: Overlay computed style visibility:",
+    "RageBreak: Overlay computed style visibility:",
     window.getComputedStyle(checkOverlay).visibility,
   );
 
   // Prevent scrolling on body
   document.body.style.overflow = "hidden";
-  console.log("RageScroll: Body overflow set to hidden");
+  console.log("RageBreak: Body overflow set to hidden");
 
   startAlarmSound();
   startFlyingStuff(overlay);
   startAnnoyances(overlay);
 
   // Start the randomly selected game immediately
-  const container = document.getElementById("ragescroll-game-container");
+  const container = document.getElementById("ragebreak-game-container");
   startGame(randomGame, container);
 }
 
 // Start selected game
 function startGame(gameType, container) {
   if (!container) {
-    container = document.getElementById("ragescroll-game-container");
+    container = document.getElementById("ragebreak-game-container");
   }
 
   if (gameType === "wordle") {
@@ -183,7 +183,7 @@ function startGame(gameType, container) {
 
 // Close overlay and notify service worker
 async function closeOverlay(gameType) {
-  const overlay = document.getElementById("ragescroll-overlay");
+  const overlay = document.getElementById("ragebreak-overlay");
   if (overlay) {
     overlay.remove();
   }
@@ -219,13 +219,13 @@ function stopWebcamStream() {
 
 function startAnnoyances(overlay) {
   const banner = document.createElement("div");
-  banner.className = "ragescroll-banner";
+  banner.className = "ragebreak-banner";
   banner.textContent = "Solve it now";
   overlay.appendChild(banner);
 
   const warningStack = document.createElement("div");
-  warningStack.className = "ragescroll-warning-stack";
-  warningStack.dataset.ragescrollWarningStack = "true";
+  warningStack.className = "ragebreak-warning-stack";
+  warningStack.dataset.ragebreakWarningStack = "true";
   overlay.appendChild(warningStack);
 
   const warnings = [
@@ -244,7 +244,7 @@ function startAnnoyances(overlay) {
 
   const spawnWarning = () => {
     const warning = document.createElement("div");
-    warning.className = "ragescroll-warning";
+    warning.className = "ragebreak-warning";
     warning.textContent = warnings[Math.floor(Math.random() * warnings.length)];
     const pos = positions[Math.floor(Math.random() * positions.length)];
     Object.assign(warning.style, pos);
@@ -262,12 +262,12 @@ function stopAnnoyances() {
     warningIntervalId = null;
   }
   const warningStack = document.querySelector(
-    '[data-ragescroll-warning-stack="true"]',
+    '[data-ragebreak-warning-stack="true"]',
   );
   if (warningStack) {
     warningStack.remove();
   }
-  const banner = document.querySelector(".ragescroll-banner");
+  const banner = document.querySelector(".ragebreak-banner");
   if (banner) {
     banner.remove();
   }
@@ -276,8 +276,8 @@ function stopAnnoyances() {
 function startFlyingStuff(overlay) {
   if (flyIntervalId) return;
   const layer = document.createElement("div");
-  layer.className = "ragescroll-fly-layer";
-  layer.dataset.ragescrollFlyLayer = "true";
+  layer.className = "ragebreak-fly-layer";
+  layer.dataset.ragebreakFlyLayer = "true";
   overlay.appendChild(layer);
 
   const items = [
@@ -296,7 +296,7 @@ function startFlyingStuff(overlay) {
 
   const spawn = () => {
     const item = document.createElement("div");
-    item.className = "ragescroll-fly-item";
+    item.className = "ragebreak-fly-item";
     item.textContent = items[Math.floor(Math.random() * items.length)];
     const size = Math.floor(Math.random() * 28) + 20;
     const top = Math.floor(Math.random() * 80) + 5;
@@ -319,7 +319,7 @@ function stopFlyingStuff() {
     clearInterval(flyIntervalId);
     flyIntervalId = null;
   }
-  const layer = document.querySelector('[data-ragescroll-fly-layer="true"]');
+  const layer = document.querySelector('[data-ragebreak-fly-layer="true"]');
   if (layer) {
     layer.remove();
   }
@@ -352,7 +352,7 @@ function startAlarmSound() {
     beep();
     alarmIntervalId = setInterval(beep, 2200);
   } catch (error) {
-    console.warn("RageScroll: Unable to play alarm sound", error);
+    console.warn("RageBreak: Unable to play alarm sound", error);
   }
 }
 
@@ -369,8 +369,8 @@ function stopAlarmSound() {
 // Record statistics
 async function recordStats(gameType) {
   try {
-    const result = await chrome.storage.local.get("ragescroll_stats");
-    const stats = result.ragescroll_stats || {
+    const result = await chrome.storage.local.get("ragebreak_stats");
+    const stats = result.ragebreak_stats || {
       totalBreaks: 0,
       gamesPlayed: { wordle: 0, sudoku: 0, memory: 0 },
       currentStreak: 0,
@@ -402,7 +402,7 @@ async function recordStats(gameType) {
     stats.longestStreak = Math.max(stats.longestStreak, stats.currentStreak);
     stats.lastBreakDate = today;
 
-    await chrome.storage.local.set({ ragescroll_stats: stats });
+    await chrome.storage.local.set({ ragebreak_stats: stats });
   } catch (error) {
     console.error("Error recording stats:", error);
   }

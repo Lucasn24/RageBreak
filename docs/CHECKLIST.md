@@ -1,4 +1,4 @@
-# ✅ RageScroll Extension - Complete Checklist
+# ✅ RageBreak Extension - Complete Checklist
 
 ## Files Created
 

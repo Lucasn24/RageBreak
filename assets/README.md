@@ -1,8 +1,9 @@
-# RageScroll Icons
+# RageBreak Icons
 
 This folder contains the extension icons in multiple sizes.
 
 You'll need to create PNG icons in the following sizes:
+
 - icon16.png (16x16 pixels) - for extension toolbar
 - icon48.png (48x48 pixels) - for extension management page
 - icon128.png (128x128 pixels) - for Chrome Web Store
@@ -10,6 +11,7 @@ You'll need to create PNG icons in the following sizes:
 ## Creating Icons
 
 You can create simple icons using:
+
 1. An online icon generator
 2. Design tools like Figma, Canva, or Photoshop
 3. Use emoji as placeholder icons
@@ -17,6 +19,7 @@ You can create simple icons using:
 ### Quick Placeholder Icons
 
 For testing purposes, you can use these emoji-based icons:
+
 - 🎮 (game controller emoji)
 - ⏱️ (timer clock emoji)
 - 💪 (flexed bicep emoji)
@@ -24,6 +27,7 @@ For testing purposes, you can use these emoji-based icons:
 ### Recommended Icon Design
 
 The icon should represent:
+
 - Taking breaks (⏸️, ⏱️)
 - Gaming/fun (🎮, 🎯)
 - Health/wellness (💪, 🧘)
