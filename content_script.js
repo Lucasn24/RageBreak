@@ -6,6 +6,10 @@ console.log("RageScroll Content Script: LOADED");
 let activityTimeout;
 let overlayShown = false;
 let activityDetected = false;
+let alarmAudioContext = null;
+let alarmIntervalId = null;
+let flyIntervalId = null;
+let warningIntervalId = null;
 
 function safeSendMessage(message) {
   if (!chrome.runtime?.id) {
@@ -86,19 +90,22 @@ function showBreakOverlay() {
   overlayShown = true;
 
   // Randomly select a game
-  const games = ["wordle", "sudoku", "memory"];
+  //const games = ['wordle', 'sudoku', 'memory', 'snake'];
+  const games = ['math'];
   const randomGame = games[Math.floor(Math.random() * games.length)];
   console.log("RageScroll: Randomly selected game:", randomGame);
 
   // Create overlay container
-  const overlay = document.createElement("div");
-  overlay.id = "ragescroll-overlay";
-  overlay.className = "ragescroll-overlay";
-
+  const overlay = document.createElement('div');
+  overlay.id = 'ragescroll-overlay';
+  overlay.className = 'ragescroll-overlay';
+  overlay.classList.add('annoying', 'shake');
+  
   // Create overlay content (without game selector)
   overlay.innerHTML = `
     <div class="ragescroll-content">
       <div class="ragescroll-header">
+        <div class="ragescroll-siren">Solve now!</div>
         <h1>Still Scrolling?</h1>
         <h3>
             You've been here long enough.<br/>
@@ -135,9 +142,13 @@ function showBreakOverlay() {
   );
 
   // Prevent scrolling on body
-  document.body.style.overflow = "hidden";
-  console.log("RageScroll: Body overflow set to hidden");
+  document.body.style.overflow = 'hidden';
+  console.log('RageScroll: Body overflow set to hidden');
 
+  startAlarmSound();
+  startFlyingStuff(overlay);
+  startAnnoyances(overlay);
+  
   // Start the randomly selected game immediately
   const container = document.getElementById("ragescroll-game-container");
   startGame(randomGame, container);
@@ -155,6 +166,10 @@ function startGame(gameType, container) {
     initSudoku(container);
   } else if (gameType === "memory") {
     initMemoryMatch(container);
+  } else if (gameType === 'snake') {
+    initSnake(container);
+  } else if (gameType === 'math') {
+    initMath(container);
   }
 }
 
@@ -581,6 +596,294 @@ function initMemoryMatch(container) {
   }
 }
 
+// Mini Snake Game
+function initSnake(container) {
+  const targetScore = 5; // The "Proof of Work" requirement
+  let score = 0;
+  let gameActive = true;
+  
+  // Game Configuration
+  const gridSize = 20;
+  const tileCount = 15; // 15x15 grid
+  let snake = [{ x: 7, y: 7 }];
+  let food = { x: 5, y: 5 };
+  let dx = 0;
+  let dy = 0;
+  
+  container.innerHTML = `
+    <div class="snake-game">
+      <h2>Snake Challenge</h2>
+      <p class="game-subtitle">Reach ${targetScore} points to unlock your content</p>
+      
+      <div class="snake-board-wrapper">
+        <canvas id="snake-canvas" width="${tileCount * gridSize}" height="${tileCount * gridSize}"></canvas>
+      </div>
+
+      <div class="game-status-bar">
+        <span>Score: <strong id="snake-score">0</strong> / ${targetScore}</span>
+      </div>
+      
+      <p class="game-message" id="snake-message">Press an Arrow Key to Start</p>
+    </div>
+  `;
+
+  const canvas = container.querySelector('#snake-canvas');
+  const ctx = canvas.getContext('2d');
+  const scoreDisplay = container.querySelector('#snake-score');
+  const message = container.querySelector('#snake-message');
+
+  // Input Handling
+  function handleKeyPress(e) {
+    if (!gameActive) return;
+    
+    const key = e.key;
+    const goingUp = dy === -1;
+    const goingDown = dy === 1;
+    const goingRight = dx === 1;
+    const goingLeft = dx === -1;
+
+    if (key === 'ArrowLeft' && !goingRight) { dx = -1; dy = 0; }
+    if (key === 'ArrowUp' && !goingDown) { dx = 0; dy = -1; }
+    if (key === 'ArrowRight' && !goingLeft) { dx = 1; dy = 0; }
+    if (key === 'ArrowDown' && !goingUp) { dx = 0; dy = 1; }
+    
+    if (dx !== 0 || dy !== 0) {
+      message.textContent = "Keep going!";
+    }
+  }
+
+  document.addEventListener('keydown', handleKeyPress);
+
+  function main() {
+    if (didGameEnd()) {
+      message.textContent = "💥 Crashed! Restarting...";
+      setTimeout(resetGame, 1000);
+      return;
+    }
+
+    setTimeout(function onTick() {
+      if (!gameActive) return;
+      clearCanvas();
+      drawFood();
+      advanceSnake();
+      drawSnake();
+      main();
+    }, 100); // Game Speed
+  }
+
+  function clearCanvas() {
+    ctx.fillStyle = "#1a1a1a";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // Draw subtle grid
+    ctx.strokeStyle = "#333";
+    for(let i=0; i<canvas.width; i+=gridSize) {
+      ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i,canvas.height); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0,i); ctx.lineTo(canvas.width,i); ctx.stroke();
+    }
+  }
+
+  function drawSnake() {
+    snake.forEach((part, index) => {
+      ctx.fillStyle = (index === 0) ? "#4CAF50" : "#81C784";
+      ctx.fillRect(part.x * gridSize, part.y * gridSize, gridSize - 2, gridSize - 2);
+    });
+  }
+
+  function advanceSnake() {
+    const head = { x: snake[0].x + dx, y: snake[0].y + dy };
+    snake.unshift(head);
+
+    const didEatFood = snake[0].x === food.x && snake[0].y === food.y;
+    if (didEatFood) {
+      score++;
+      scoreDisplay.textContent = score;
+      createFood();
+      checkWinCondition();
+    } else {
+      if (dx !== 0 || dy !== 0) snake.pop();
+    }
+  }
+
+  function didGameEnd() {
+    if (dx === 0 && dy === 0) return false;
+    const hitLeftWall = snake[0].x < 0;
+    const hitRightWall = snake[0].x > tileCount - 1;
+    const hitTopWall = snake[0].y < 0;
+    const hitBottomWall = snake[0].y > tileCount - 1;
+    
+    let hitSelf = false;
+    for (let i = 4; i < snake.length; i++) {
+      if (snake[i].x === snake[0].x && snake[i].y === snake[0].y) hitSelf = true;
+    }
+    return hitLeftWall || hitRightWall || hitTopWall || hitBottomWall || hitSelf;
+  }
+
+  function createFood() {
+    food.x = Math.floor(Math.random() * tileCount);
+    food.y = Math.floor(Math.random() * tileCount);
+    // Make sure food doesn't spawn on snake body
+    snake.forEach(part => {
+      if (part.x === food.x && part.y === food.y) createFood();
+    });
+  }
+
+  function drawFood() {
+    ctx.fillStyle = "#ff4757";
+    ctx.fillRect(food.x * gridSize, food.y * gridSize, gridSize - 2, gridSize - 2);
+  }
+
+  function checkWinCondition() {
+    if (score >= targetScore) {
+      gameActive = false;
+      message.textContent = "🎉 Goal Reached! Content Unlocked.";
+      message.style.color = "#4CAF50";
+      document.removeEventListener('keydown', handleKeyPress);
+      setTimeout(() => closeOverlay('snake'), 1500);
+    }
+  }
+
+  function resetGame() {
+    snake = [{ x: 7, y: 7 }];
+    dx = 0; dy = 0;
+    score = 0;
+    scoreDisplay.textContent = score;
+    message.textContent = "Press an Arrow Key to Start";
+    createFood();
+    main();
+  }
+
+  // Start the loop
+  createFood();
+  main();
+}
+
+// Mini Math Game - Timed Hard Mode
+function initMath(container) {
+  const targetStreak = 5;
+  const timeLimit = 10; // Seconds per problem
+  let currentStreak = 0;
+  let correctAnswer;
+  let timerInterval;
+  let timeLeft;
+
+  container.innerHTML = `
+    <div class="math-game">
+      <h2>Timed Mental Hard Mode</h2>
+      <p class="game-subtitle">Solve ${targetStreak} in a row. Don't let the timer hit zero!</p>
+      
+      <div class="math-stats-row">
+        <div class="stat-box">Streak: <strong id="math-streak">0</strong> / ${targetStreak}</div>
+        <div class="stat-box timer-box">Time: <strong id="math-timer">${timeLimit}</strong>s</div>
+      </div>
+
+      <div class="math-problem-box">
+        <span id="math-question">...</span>
+      </div>
+
+      <div class="math-input-wrapper">
+        <input type="number" id="math-answer" placeholder="?">
+        <button id="math-submit">Check</button>
+      </div>
+      
+      <p class="game-message" id="math-message">Hurry up!</p>
+    </div>
+  `;
+
+  const questionEl = container.querySelector('#math-question');
+  const answerInput = container.querySelector('#math-answer');
+  const submitBtn = container.querySelector('#math-submit');
+  const streakDisplay = container.querySelector('#math-streak');
+  const timerDisplay = container.querySelector('#math-timer');
+  const message = container.querySelector('#math-message');
+
+  function startTimer() {
+    clearInterval(timerInterval);
+    timeLeft = timeLimit;
+    timerDisplay.textContent = timeLeft;
+    timerDisplay.parentElement.style.color = "#ffffff";
+
+    timerInterval = setInterval(() => {
+      timeLeft--;
+      timerDisplay.textContent = timeLeft;
+
+      if (timeLeft <= 5) {
+        timerDisplay.parentElement.style.color = "#FF5252"; // Turn red for urgency
+      }
+
+      if (timeLeft <= 0) {
+        handleTimeout();
+      }
+    }, 1000);
+  }
+
+  function handleTimeout() {
+    clearInterval(timerInterval);
+    currentStreak = 0;
+    streakDisplay.textContent = currentStreak;
+    message.textContent = "⏰ Time Out! Streak reset.";
+    message.style.color = "#FF5252";
+    setTimeout(generateIntermediateProblem, 1000);
+  }
+
+  function generateIntermediateProblem() {
+  const type = Math.floor(Math.random() * 3);
+  let qText = "";
+
+  if (type === 0) {
+    // Harder Addition (e.g., 68 + 75) - Requires mental carry-over
+    const a = Math.floor(Math.random() * 80) + 20;
+    const b = Math.floor(Math.random() * 80) + 20;
+    correctAnswer = a + b;
+    qText = `${a} + ${b}`;
+  } else if (type === 1) {
+    // Larger Subtraction (e.g., 145 - 67)
+    const a = Math.floor(Math.random() * 150) + 50;
+    const b = Math.floor(Math.random() * 40) + 10;
+    correctAnswer = a - b;
+    qText = `${a} - ${b}`;
+  } else {
+    // Intermediate Multiplication (e.g., 14 × 6 or 12 × 12)
+    const a = Math.floor(Math.random() * 14) + 2; 
+    const b = Math.floor(Math.random() * 12) + 2;
+    correctAnswer = a * b;
+    qText = `${a} × ${b}`;
+  }
+
+  questionEl.textContent = qText;
+  answerInput.value = '';
+  answerInput.focus();
+  startTimer();
+}
+
+  function checkAnswer() {
+    const userValue = parseInt(answerInput.value);
+    
+    if (userValue === correctAnswer) {
+      clearInterval(timerInterval);
+      currentStreak++;
+      streakDisplay.textContent = currentStreak;
+      message.textContent = "✅ Correct!";
+      message.style.color = "#4CAF50";
+      
+      if (currentStreak >= targetStreak) {
+        message.textContent = "🎉 Brain Verified!";
+        setTimeout(() => closeOverlay('math'), 1500);
+      } else {
+        setTimeout(generateIntermediateProblem, 600);
+      }
+    } else {
+      handleTimeout(); // Treat wrong answer as a reset (Hard Mode)
+    }
+  }
+
+  submitBtn.addEventListener('click', checkAnswer);
+  answerInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') checkAnswer();
+  });
+
+  generateIntermediateProblem();
+}
+
 // Close overlay and notify service worker
 async function closeOverlay(gameType) {
   const overlay = document.getElementById("ragescroll-overlay");
@@ -589,8 +892,12 @@ async function closeOverlay(gameType) {
   }
 
   overlayShown = false;
-  document.body.style.overflow = "";
+  document.body.style.overflow = '';
 
+  stopAlarmSound();
+  stopFlyingStuff();
+  stopAnnoyances();
+  
   // Record stats
   if (gameType) {
     await recordStats(gameType);
@@ -598,6 +905,133 @@ async function closeOverlay(gameType) {
 
   // Notify service worker that break is completed
   safeSendMessage({ type: "BREAK_COMPLETED" });
+}
+
+function startAnnoyances(overlay) {
+  const banner = document.createElement('div');
+  banner.className = 'ragescroll-banner';
+  banner.textContent = 'Solve it now';
+  overlay.appendChild(banner);
+
+  const warningStack = document.createElement('div');
+  warningStack.className = 'ragescroll-warning-stack';
+  warningStack.dataset.ragescrollWarningStack = 'true';
+  overlay.appendChild(warningStack);
+
+  const warnings = ['⚠️ Focus!', '⏱️ Break time', '🚨 Stop scrolling', '❗ Solve the puzzle', '🔔 Pay attention'];
+  const positions = [
+    { top: '8%', left: '6%' },
+    { top: '8%', right: '6%' },
+    { bottom: '10%', left: '6%' },
+    { bottom: '10%', right: '6%' }
+  ];
+
+  const spawnWarning = () => {
+    const warning = document.createElement('div');
+    warning.className = 'ragescroll-warning';
+    warning.textContent = warnings[Math.floor(Math.random() * warnings.length)];
+    const pos = positions[Math.floor(Math.random() * positions.length)];
+    Object.assign(warning.style, pos);
+    warningStack.appendChild(warning);
+    setTimeout(() => warning.remove(), 1600);
+  };
+
+  spawnWarning();
+  warningIntervalId = setInterval(spawnWarning, 800);
+}
+
+function stopAnnoyances() {
+  if (warningIntervalId) {
+    clearInterval(warningIntervalId);
+    warningIntervalId = null;
+  }
+  const warningStack = document.querySelector('[data-ragescroll-warning-stack="true"]');
+  if (warningStack) {
+    warningStack.remove();
+  }
+  const banner = document.querySelector('.ragescroll-banner');
+  if (banner) {
+    banner.remove();
+  }
+}
+
+function startFlyingStuff(overlay) {
+  if (flyIntervalId) return;
+  const layer = document.createElement('div');
+  layer.className = 'ragescroll-fly-layer';
+  layer.dataset.ragescrollFlyLayer = 'true';
+  overlay.appendChild(layer);
+
+  const items = ['💥', '⚡', '🚨', '🔊', '💣', '👾', '🌀', '🔥', '😵', '💫', '🔔'];
+
+  const spawn = () => {
+    const item = document.createElement('div');
+    item.className = 'ragescroll-fly-item';
+    item.textContent = items[Math.floor(Math.random() * items.length)];
+    const size = Math.floor(Math.random() * 28) + 20;
+    const top = Math.floor(Math.random() * 80) + 5;
+    const duration = Math.floor(Math.random() * 6) + 6;
+    item.style.fontSize = `${size}px`;
+    item.style.top = `${top}%`;
+    item.style.animationDuration = `${duration}s`;
+    layer.appendChild(item);
+    item.addEventListener('animationend', () => {
+      item.remove();
+    });
+  };
+
+  spawn();
+  flyIntervalId = setInterval(spawn, 700);
+}
+
+function stopFlyingStuff() {
+  if (flyIntervalId) {
+    clearInterval(flyIntervalId);
+    flyIntervalId = null;
+  }
+  const layer = document.querySelector('[data-ragescroll-fly-layer="true"]');
+  if (layer) {
+    layer.remove();
+  }
+}
+
+function startAlarmSound() {
+  if (alarmIntervalId) return;
+  try {
+    alarmAudioContext = alarmAudioContext || new (window.AudioContext || window.webkitAudioContext)();
+    let toggle = false;
+    const beep = () => {
+      toggle = !toggle;
+      const oscillator = alarmAudioContext.createOscillator();
+      const gainNode = alarmAudioContext.createGain();
+      oscillator.type = 'sawtooth';
+      oscillator.frequency.value = toggle ? 1600 : 900;
+      gainNode.gain.value = 0.3;
+      oscillator.connect(gainNode);
+      gainNode.connect(alarmAudioContext.destination);
+      oscillator.start();
+      setTimeout(() => {
+        oscillator.stop();
+        oscillator.disconnect();
+        gainNode.disconnect();
+      }, 1500);
+    };
+
+    beep();
+    alarmIntervalId = setInterval(beep, 2200);
+  } catch (error) {
+    console.warn('RageScroll: Unable to play alarm sound', error);
+  }
+}
+
+function stopAlarmSound() {
+  if (alarmIntervalId) {
+    clearInterval(alarmIntervalId);
+    alarmIntervalId = null;
+  }
+  if (alarmAudioContext && alarmAudioContext.state === 'running') {
+    alarmAudioContext.suspend();
+  }
 }
 
 // Record statistics
