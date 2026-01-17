@@ -72,8 +72,7 @@ function showBreakOverlay() {
   overlayShown = true;
   
   // Randomly select a game
-  //const games = ['wordle', 'sudoku', 'memory', 'snake'];
-  const games = ['math'];
+  const games = ['wordle', 'sudoku', 'memory', 'snake', 'math'];
   const randomGame = games[Math.floor(Math.random() * games.length)];
   console.log('RageScroll: Randomly selected game:', randomGame);
   
