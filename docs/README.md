@@ -13,7 +13,7 @@ RageBreak is a Manifest V3 Chrome extension that enforces micro‑breaks while y
 
 ## Install (Load Unpacked)
 
-1. git clone this repo
+1. Git clone this Repo
 2. Open `chrome://extensions/`
 3. Enable **Developer mode**
 4. Click **Load unpacked** and select the `RageScroll/RageBreak` folder
