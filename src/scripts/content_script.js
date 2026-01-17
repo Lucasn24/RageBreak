@@ -258,37 +258,66 @@ function showCelebration(gameType) {
 
 function playCelebrationSound() {
   try {
-    const audioCtx =
-      alarmAudioContext ||
-      new (window.AudioContext || window.webkitAudioContext)();
-    alarmAudioContext = audioCtx;
-    if (audioCtx.state === "suspended") {
-      audioCtx.resume();
-    }
+    const audioUrl = chrome.runtime.getURL("assets/yay-6326.mp3");
+    const audio = new Audio(audioUrl);
+    audio.volume = 0.8;
+    audio.play().catch(() => {
+      const audioCtx =
+        alarmAudioContext ||
+        new (window.AudioContext || window.webkitAudioContext)();
+      alarmAudioContext = audioCtx;
+      if (audioCtx.state === "suspended") {
+        audioCtx.resume();
+      }
 
-    const now = audioCtx.currentTime;
-    const gainNode = audioCtx.createGain();
-    gainNode.gain.setValueAtTime(0.001, now);
-    gainNode.gain.exponentialRampToValueAtTime(0.25, now + 0.02);
-    gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 1.4);
-    gainNode.connect(audioCtx.destination);
+      const now = audioCtx.currentTime;
+      const master = audioCtx.createGain();
+      master.gain.setValueAtTime(0.001, now);
+      master.gain.exponentialRampToValueAtTime(0.22, now + 0.03);
+      master.gain.exponentialRampToValueAtTime(0.0001, now + 1.6);
+      master.connect(audioCtx.destination);
 
-    const osc1 = audioCtx.createOscillator();
-    osc1.type = "triangle";
-    osc1.frequency.setValueAtTime(523.25, now);
-    osc1.frequency.exponentialRampToValueAtTime(783.99, now + 0.6);
+      const source = audioCtx.createOscillator();
+      source.type = "sawtooth";
+      source.frequency.setValueAtTime(220, now);
+      source.frequency.exponentialRampToValueAtTime(330, now + 0.25);
+      source.frequency.exponentialRampToValueAtTime(440, now + 0.7);
 
-    const osc2 = audioCtx.createOscillator();
-    osc2.type = "triangle";
-    osc2.frequency.setValueAtTime(659.25, now);
-    osc2.frequency.exponentialRampToValueAtTime(987.77, now + 0.6);
+      const formantA = audioCtx.createBiquadFilter();
+      formantA.type = "bandpass";
+      formantA.frequency.setValueAtTime(700, now);
+      formantA.Q.value = 9;
 
-    osc1.connect(gainNode);
-    osc2.connect(gainNode);
-    osc1.start(now);
-    osc2.start(now);
-    osc1.stop(now + 1.4);
-    osc2.stop(now + 1.4);
+      const formantB = audioCtx.createBiquadFilter();
+      formantB.type = "bandpass";
+      formantB.frequency.setValueAtTime(1200, now);
+      formantB.Q.value = 10;
+
+      const formantC = audioCtx.createBiquadFilter();
+      formantC.type = "bandpass";
+      formantC.frequency.setValueAtTime(2600, now);
+      formantC.Q.value = 12;
+
+      const mixA = audioCtx.createGain();
+      const mixB = audioCtx.createGain();
+      const mixC = audioCtx.createGain();
+      mixA.gain.value = 0.6;
+      mixB.gain.value = 0.5;
+      mixC.gain.value = 0.3;
+
+      source.connect(formantA);
+      source.connect(formantB);
+      source.connect(formantC);
+      formantA.connect(mixA);
+      formantB.connect(mixB);
+      formantC.connect(mixC);
+      mixA.connect(master);
+      mixB.connect(master);
+      mixC.connect(master);
+
+      source.start(now);
+      source.stop(now + 1.6);
+    });
   } catch (error) {
     console.warn("RageBreak: Unable to play celebration sound", error);
   }

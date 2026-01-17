@@ -48,6 +48,12 @@
     }
   },
   "options_page": "src/pages/options.html",
+  "web_accessible_resources": [
+    {
+      "resources": ["assets/yay-6326.mp3"],
+      "matches": ["<all_urls>"]
+    }
+  ],
   "commands": {
     "toggle-extension": {
       "suggested_key": {
