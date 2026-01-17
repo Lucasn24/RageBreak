@@ -641,7 +641,7 @@ function initSnake(container) {
 // Mini Math Game - Timed Hard Mode
 function initMath(container) {
   const targetStreak = 5;
-  const timeLimit = 15; // Seconds per problem
+  const timeLimit = 10; // Seconds per problem
   let currentStreak = 0;
   let correctAnswer;
   let timerInterval;
@@ -703,40 +703,38 @@ function initMath(container) {
     streakDisplay.textContent = currentStreak;
     message.textContent = "⏰ Time Out! Streak reset.";
     message.style.color = "#FF5252";
-    setTimeout(generateHardProblem, 1000);
+    setTimeout(generateIntermediateProblem, 1000);
   }
 
-  function generateHardProblem() {
-    const type = Math.floor(Math.random() * 4);
-    let qText = "";
+  function generateIntermediateProblem() {
+  const type = Math.floor(Math.random() * 3);
+  let qText = "";
 
-    if (type === 0) {
-        const a = Math.floor(Math.random() * 10) + 11;
-        const b = Math.floor(Math.random() * 10) + 11;
-        correctAnswer = a * b;
-        qText = `${a} × ${b}`;
-    } else if (type === 1) {
-        const a = Math.floor(Math.random() * 800) + 100;
-        const b = Math.floor(Math.random() * 800) + 100;
-        correctAnswer = a + b;
-        qText = `${a} + ${b}`;
-    } else if (type === 2) {
-        const a = Math.floor(Math.random() * 20) + 5;
-        const b = Math.floor(Math.random() * 20) + 5;
-        const c = Math.floor(Math.random() * 8) + 3;
-        correctAnswer = (a + b) * c;
-        qText = `(${a} + ${b}) × ${c}`;
-    } else {
-        const a = Math.floor(Math.random() * 10) + 15;
-        correctAnswer = a * a;
-        qText = `${a}²`;
-    }
-
-    questionEl.textContent = qText;
-    answerInput.value = '';
-    answerInput.focus();
-    startTimer();
+  if (type === 0) {
+    // Harder Addition (e.g., 68 + 75) - Requires mental carry-over
+    const a = Math.floor(Math.random() * 80) + 20;
+    const b = Math.floor(Math.random() * 80) + 20;
+    correctAnswer = a + b;
+    qText = `${a} + ${b}`;
+  } else if (type === 1) {
+    // Larger Subtraction (e.g., 145 - 67)
+    const a = Math.floor(Math.random() * 150) + 50;
+    const b = Math.floor(Math.random() * 40) + 10;
+    correctAnswer = a - b;
+    qText = `${a} - ${b}`;
+  } else {
+    // Intermediate Multiplication (e.g., 14 × 6 or 12 × 12)
+    const a = Math.floor(Math.random() * 14) + 2; 
+    const b = Math.floor(Math.random() * 12) + 2;
+    correctAnswer = a * b;
+    qText = `${a} × ${b}`;
   }
+
+  questionEl.textContent = qText;
+  answerInput.value = '';
+  answerInput.focus();
+  startTimer();
+}
 
   function checkAnswer() {
     const userValue = parseInt(answerInput.value);
@@ -752,7 +750,7 @@ function initMath(container) {
         message.textContent = "🎉 Brain Verified!";
         setTimeout(() => closeOverlay('math'), 1500);
       } else {
-        setTimeout(generateHardProblem, 600);
+        setTimeout(generateIntermediateProblem, 600);
       }
     } else {
       handleTimeout(); // Treat wrong answer as a reset (Hard Mode)
@@ -764,7 +762,7 @@ function initMath(container) {
     if (e.key === 'Enter') checkAnswer();
   });
 
-  generateHardProblem();
+  generateIntermediateProblem();
 }
 
 // Close overlay and notify service worker
