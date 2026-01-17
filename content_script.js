@@ -9,6 +9,7 @@ let activityDetected = false;
 let alarmAudioContext = null;
 let alarmIntervalId = null;
 let flyIntervalId = null;
+let warningIntervalId = null;
 
 // Throttle activity detection to avoid spamming service worker
 const throttledActivityDetection = throttle(() => {
@@ -79,11 +80,13 @@ function showBreakOverlay() {
   const overlay = document.createElement('div');
   overlay.id = 'ragescroll-overlay';
   overlay.className = 'ragescroll-overlay';
+  overlay.classList.add('annoying', 'shake');
   
   // Create overlay content (without game selector)
   overlay.innerHTML = `
     <div class="ragescroll-content">
       <div class="ragescroll-header">
+        <div class="ragescroll-siren">Solve now!</div>
         <h1>Still Scrolling?</h1>
         <h3>
             You've been here long enough.<br/>
@@ -119,6 +122,7 @@ function showBreakOverlay() {
 
   startAlarmSound();
   startFlyingStuff(overlay);
+  startAnnoyances(overlay);
   
   // Start the randomly selected game immediately
   const container = document.getElementById('ragescroll-game-container');
@@ -480,6 +484,7 @@ async function closeOverlay(gameType) {
 
   stopAlarmSound();
   stopFlyingStuff();
+  stopAnnoyances();
   
   // Record stats
   if (gameType) {
@@ -488,6 +493,54 @@ async function closeOverlay(gameType) {
   
   // Notify service worker that break is completed
   chrome.runtime.sendMessage({ type: 'BREAK_COMPLETED' });
+}
+
+function startAnnoyances(overlay) {
+  const banner = document.createElement('div');
+  banner.className = 'ragescroll-banner';
+  banner.textContent = 'Solve it now';
+  overlay.appendChild(banner);
+
+  const warningStack = document.createElement('div');
+  warningStack.className = 'ragescroll-warning-stack';
+  warningStack.dataset.ragescrollWarningStack = 'true';
+  overlay.appendChild(warningStack);
+
+  const warnings = ['⚠️ Focus!', '⏱️ Break time', '🚨 Stop scrolling', '❗ Solve the puzzle', '🔔 Pay attention'];
+  const positions = [
+    { top: '8%', left: '6%' },
+    { top: '8%', right: '6%' },
+    { bottom: '10%', left: '6%' },
+    { bottom: '10%', right: '6%' }
+  ];
+
+  const spawnWarning = () => {
+    const warning = document.createElement('div');
+    warning.className = 'ragescroll-warning';
+    warning.textContent = warnings[Math.floor(Math.random() * warnings.length)];
+    const pos = positions[Math.floor(Math.random() * positions.length)];
+    Object.assign(warning.style, pos);
+    warningStack.appendChild(warning);
+    setTimeout(() => warning.remove(), 1600);
+  };
+
+  spawnWarning();
+  warningIntervalId = setInterval(spawnWarning, 800);
+}
+
+function stopAnnoyances() {
+  if (warningIntervalId) {
+    clearInterval(warningIntervalId);
+    warningIntervalId = null;
+  }
+  const warningStack = document.querySelector('[data-ragescroll-warning-stack="true"]');
+  if (warningStack) {
+    warningStack.remove();
+  }
+  const banner = document.querySelector('.ragescroll-banner');
+  if (banner) {
+    banner.remove();
+  }
 }
 
 function startFlyingStuff(overlay) {
