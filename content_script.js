@@ -72,7 +72,8 @@ function showBreakOverlay() {
   overlayShown = true;
   
   // Randomly select a game
-  const games = ['wordle', 'sudoku', 'memory', 'snake'];
+  //const games = ['wordle', 'sudoku', 'memory', 'snake'];
+  const games = ['math'];
   const randomGame = games[Math.floor(Math.random() * games.length)];
   console.log('RageScroll: Randomly selected game:', randomGame);
   
@@ -143,6 +144,8 @@ function startGame(gameType, container) {
     initMemoryMatch(container);
   } else if (gameType === 'snake') {
     initSnake(container);
+  } else if (gameType === 'math') {
+    initMath(container);
   }
 }
 
@@ -633,6 +636,135 @@ function initSnake(container) {
   // Start the loop
   createFood();
   main();
+}
+
+// Mini Math Game - Timed Hard Mode
+function initMath(container) {
+  const targetStreak = 5;
+  const timeLimit = 15; // Seconds per problem
+  let currentStreak = 0;
+  let correctAnswer;
+  let timerInterval;
+  let timeLeft;
+
+  container.innerHTML = `
+    <div class="math-game">
+      <h2>Timed Mental Hard Mode</h2>
+      <p class="game-subtitle">Solve ${targetStreak} in a row. Don't let the timer hit zero!</p>
+      
+      <div class="math-stats-row">
+        <div class="stat-box">Streak: <strong id="math-streak">0</strong> / ${targetStreak}</div>
+        <div class="stat-box timer-box">Time: <strong id="math-timer">${timeLimit}</strong>s</div>
+      </div>
+
+      <div class="math-problem-box">
+        <span id="math-question">...</span>
+      </div>
+
+      <div class="math-input-wrapper">
+        <input type="number" id="math-answer" placeholder="?">
+        <button id="math-submit">Check</button>
+      </div>
+      
+      <p class="game-message" id="math-message">Hurry up!</p>
+    </div>
+  `;
+
+  const questionEl = container.querySelector('#math-question');
+  const answerInput = container.querySelector('#math-answer');
+  const submitBtn = container.querySelector('#math-submit');
+  const streakDisplay = container.querySelector('#math-streak');
+  const timerDisplay = container.querySelector('#math-timer');
+  const message = container.querySelector('#math-message');
+
+  function startTimer() {
+    clearInterval(timerInterval);
+    timeLeft = timeLimit;
+    timerDisplay.textContent = timeLeft;
+    timerDisplay.parentElement.style.color = "#ffffff";
+
+    timerInterval = setInterval(() => {
+      timeLeft--;
+      timerDisplay.textContent = timeLeft;
+
+      if (timeLeft <= 5) {
+        timerDisplay.parentElement.style.color = "#FF5252"; // Turn red for urgency
+      }
+
+      if (timeLeft <= 0) {
+        handleTimeout();
+      }
+    }, 1000);
+  }
+
+  function handleTimeout() {
+    clearInterval(timerInterval);
+    currentStreak = 0;
+    streakDisplay.textContent = currentStreak;
+    message.textContent = "⏰ Time Out! Streak reset.";
+    message.style.color = "#FF5252";
+    setTimeout(generateHardProblem, 1000);
+  }
+
+  function generateHardProblem() {
+    const type = Math.floor(Math.random() * 4);
+    let qText = "";
+
+    if (type === 0) {
+        const a = Math.floor(Math.random() * 10) + 11;
+        const b = Math.floor(Math.random() * 10) + 11;
+        correctAnswer = a * b;
+        qText = `${a} × ${b}`;
+    } else if (type === 1) {
+        const a = Math.floor(Math.random() * 800) + 100;
+        const b = Math.floor(Math.random() * 800) + 100;
+        correctAnswer = a + b;
+        qText = `${a} + ${b}`;
+    } else if (type === 2) {
+        const a = Math.floor(Math.random() * 20) + 5;
+        const b = Math.floor(Math.random() * 20) + 5;
+        const c = Math.floor(Math.random() * 8) + 3;
+        correctAnswer = (a + b) * c;
+        qText = `(${a} + ${b}) × ${c}`;
+    } else {
+        const a = Math.floor(Math.random() * 10) + 15;
+        correctAnswer = a * a;
+        qText = `${a}²`;
+    }
+
+    questionEl.textContent = qText;
+    answerInput.value = '';
+    answerInput.focus();
+    startTimer();
+  }
+
+  function checkAnswer() {
+    const userValue = parseInt(answerInput.value);
+    
+    if (userValue === correctAnswer) {
+      clearInterval(timerInterval);
+      currentStreak++;
+      streakDisplay.textContent = currentStreak;
+      message.textContent = "✅ Correct!";
+      message.style.color = "#4CAF50";
+      
+      if (currentStreak >= targetStreak) {
+        message.textContent = "🎉 Brain Verified!";
+        setTimeout(() => closeOverlay('math'), 1500);
+      } else {
+        setTimeout(generateHardProblem, 600);
+      }
+    } else {
+      handleTimeout(); // Treat wrong answer as a reset (Hard Mode)
+    }
+  }
+
+  submitBtn.addEventListener('click', checkAnswer);
+  answerInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') checkAnswer();
+  });
+
+  generateHardProblem();
 }
 
 // Close overlay and notify service worker

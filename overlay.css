@@ -538,6 +538,84 @@
     min-height: 24px;
     color: #333;
 }
+/* Main Game Container */
+.math-game {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centers items horizontally */
+    justify-content: center; /* Centers items vertically if container has height */
+    text-align: center;
+    color: #000000 !important; /* Global black text for this game */
+}
+
+/* The Problem Box - The Core Fix */
+.math-problem-box {
+    width: 100%;
+    min-height: 80px;
+    display: flex;
+    align-items: center;     /* Vertical center */
+    justify-content: center;  /* Horizontal center */
+    margin: 20px 0;
+    background: #f0f0f0;    /* Light gray background so text pops */
+    border-radius: 12px;
+    border: 2px solid #333;
+}
+
+#math-question {
+    font-size: 3rem;         /* Large text */
+    font-weight: 900;
+    color: #000000 !important; /* Forced Black Text */
+    display: block;
+    line-height: 1;
+}
+
+.math-stats-row {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 300px;
+    margin-bottom: 15px;
+}
+
+.stat-box {
+    background: #f0f0f0 !important; /* Light background */
+    padding: 8px 15px;
+    border-radius: 10px;
+    font-size: 1rem;
+    border: 1px solid #333 !important;
+    color: #000000 !important; /* Force Black Text */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#math-streak, #math-timer {
+    color: #ff4757 !important; /* Vibrant Red for the numbers */
+    margin-left: 5px;
+    font-weight: bold;
+}
+
+.timer-box strong {
+    font-family: 'Courier New', monospace;
+    font-size: 1.2rem;
+}
+
+/* Input Styling */
+#math-answer {
+    width: 120px;
+    height: 50px;
+    font-size: 1.5rem;
+    text-align: center;
+    color: #000000 !important; /* Forced Black Text */
+    background: #ffffff !important;
+    border: 2px solid #333;
+    border-radius: 8px;
+    margin-right: 10px;
+}
+
+/* Subtitles and Titles */
+.math-title { color: #00bcd4; font-weight: bold; }
+.math-subtitle { font-size: 1.5rem; color: #333; margin: 5px 0; }
 
 /* Break Warning Notification */
 .ragescroll-notification {
