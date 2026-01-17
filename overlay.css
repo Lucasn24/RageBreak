@@ -218,6 +218,7 @@
   font-weight: bold;
   text-align: center;
   background: white;
+  color: #222;
 }
 
 .sudoku-cell:focus {
