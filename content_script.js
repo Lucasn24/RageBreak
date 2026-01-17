@@ -70,7 +70,7 @@ function showBreakOverlay() {
   overlayShown = true;
   
   // Randomly select a game
-  const games = ['wordle', 'sudoku', 'memory'];
+  const games = ['wordle', 'sudoku', 'memory', 'snake'];
   const randomGame = games[Math.floor(Math.random() * games.length)];
   console.log('RageScroll: Randomly selected game:', randomGame);
   
@@ -135,6 +135,8 @@ function startGame(gameType, container) {
     initSudoku(container);
   } else if (gameType === 'memory') {
     initMemoryMatch(container);
+  } else if (gameType === 'snake') {
+    initSnake(container);
   }
 }
 
