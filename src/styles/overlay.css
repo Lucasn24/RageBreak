@@ -1,6 +1,6 @@
-/* Overlay Styles for RageScroll */
+/* Overlay Styles for RageBreak */
 
-.ragescroll-overlay {
+.ragebreak-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -17,7 +17,7 @@
   animation: fadeIn 0.3s ease-in;
 }
 
-.ragescroll-overlay::after {
+.ragebreak-overlay::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -26,22 +26,22 @@
   pointer-events: none;
 }
 
-.ragescroll-overlay > * {
+.ragebreak-overlay > * {
   position: relative;
   z-index: 1;
 }
 
-.ragescroll-overlay.annoying {
+.ragebreak-overlay.annoying {
   animation: fadeIn 0.3s ease-in;
 }
 
-.ragescroll-overlay.shake {
+.ragebreak-overlay.shake {
   animation:
     fadeIn 0.3s ease-in,
     shake 0.2s linear infinite;
 }
 
-.ragescroll-overlay.annoying::before {
+.ragebreak-overlay.annoying::before {
   content: "";
   position: absolute;
   inset: 12px;
@@ -53,11 +53,11 @@
   animation: strobe 0.2s linear infinite;
 }
 
-.ragescroll-overlay.annoying::after {
+.ragebreak-overlay.annoying::after {
   animation: bgCycle 6s ease-in-out infinite;
 }
 
-.ragescroll-overlay.shake::after {
+.ragebreak-overlay.shake::after {
   animation: bgCycle 6s ease-in-out infinite;
 }
 
@@ -118,7 +118,7 @@
   }
 }
 
-.ragescroll-banner {
+.ragebreak-banner {
   position: absolute;
   top: 12%;
   left: -40%;
@@ -147,7 +147,7 @@
   }
 }
 
-.ragescroll-siren {
+.ragebreak-siren {
   font-size: 22px;
   font-weight: 800;
   color: #ff004d;
@@ -173,13 +173,13 @@
   }
 }
 
-.ragescroll-warning-stack {
+.ragebreak-warning-stack {
   position: absolute;
   inset: 0;
   pointer-events: none;
 }
 
-.ragescroll-warning {
+.ragebreak-warning {
   position: absolute;
   background: rgba(0, 0, 0, 0.85);
   color: #fff;
@@ -271,7 +271,7 @@
   }
 }
 
-.ragescroll-content {
+.ragebreak-content {
   background: white;
   border-radius: 20px;
   padding: 40px;
@@ -282,14 +282,14 @@
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
 }
 
-.ragescroll-fly-layer {
+.ragebreak-fly-layer {
   position: absolute;
   inset: 0;
   pointer-events: none;
   overflow: hidden;
 }
 
-.ragescroll-fly-item {
+.ragebreak-fly-item {
   position: absolute;
   left: -20%;
   opacity: 0.9;
@@ -307,30 +307,30 @@
   }
 }
 
-.ragescroll-header {
+.ragebreak-header {
   text-align: center;
   margin-bottom: 30px;
 }
 
-.ragescroll-header h1 {
+.ragebreak-header h1 {
   margin: 0 0 10px 0;
   color: #333;
   font-size: 32px;
 }
 
-.ragescroll-header h3 {
+.ragebreak-header h3 {
   margin: 0 0 10px 0;
   color: #333;
   font-size: 24px;
 }
 
-.ragescroll-header p {
+.ragebreak-header p {
   margin: 0;
   color: #666;
   font-size: 16px;
 }
 
-.ragescroll-game-selector {
+.ragebreak-game-selector {
   display: flex;
   gap: 20px;
   justify-content: center;
@@ -811,7 +811,7 @@
 }
 
 /* Break Warning Notification */
-.ragescroll-notification {
+.ragebreak-notification {
   position: fixed;
   top: 20px;
   right: 20px;

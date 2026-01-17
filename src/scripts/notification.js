@@ -1,22 +1,22 @@
-// Notification Helper for RageScroll
+// Notification Helper for RageBreak
 // Shows a warning notification 30 seconds before break
 
 let notificationShown = false;
 let notificationTimeout = null;
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.type === 'SCHEDULE_NOTIFICATION') {
+  if (message.type === "SCHEDULE_NOTIFICATION") {
     scheduleNotification(message.delay);
-  } else if (message.type === 'CANCEL_NOTIFICATION') {
+  } else if (message.type === "CANCEL_NOTIFICATION") {
     cancelNotification();
   }
 });
 
 function scheduleNotification(delay) {
   cancelNotification();
-  
+
   const warningTime = delay - 30000; // 30 seconds before
-  
+
   if (warningTime > 0) {
     notificationTimeout = setTimeout(() => {
       showNotification();
@@ -34,10 +34,10 @@ function cancelNotification() {
 
 function showNotification() {
   if (notificationShown) return;
-  
-  const notification = document.createElement('div');
-  notification.id = 'ragescroll-notification';
-  notification.className = 'ragescroll-notification';
+
+  const notification = document.createElement("div");
+  notification.id = "ragebreak-notification";
+  notification.className = "ragebreak-notification";
   notification.innerHTML = `
     <div class="notification-content">
       <span class="notification-icon">⏱️</span>
@@ -45,19 +45,21 @@ function showNotification() {
       <button class="notification-close" id="notification-close">×</button>
     </div>
   `;
-  
+
   document.body.appendChild(notification);
   notificationShown = true;
-  
+
   // Add close button listener
-  document.getElementById('notification-close').addEventListener('click', hideNotification);
-  
+  document
+    .getElementById("notification-close")
+    .addEventListener("click", hideNotification);
+
   // Auto-hide after 10 seconds
   setTimeout(hideNotification, 10000);
 }
 
 function hideNotification() {
-  const notification = document.getElementById('ragescroll-notification');
+  const notification = document.getElementById("ragebreak-notification");
   if (notification) {
     notification.remove();
   }

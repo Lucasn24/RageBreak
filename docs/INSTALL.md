@@ -1,8 +1,8 @@
-# RageScroll - Quick Installation Guide
+# RageBreak - Quick Installation Guide
 
 ## What You Have
 
-Your complete RageScroll Chrome Extension with all files ready to use:
+Your complete RageBreak Chrome Extension with all files ready to use:
 
 ✅ **Core Extension Files:**
 
@@ -30,12 +30,12 @@ Your complete RageScroll Chrome Extension with all files ready to use:
 
 2. **Enable Developer Mode** → Toggle switch in top-right
 
-3. **Load Extension** → Click "Load unpacked" → Select the `RageScroll` folder
+3. **Load Extension** → Click "Load unpacked" → Select the `RageBreak` folder
 
 ## First Use
 
-1. Click the RageScroll icon in your toolbar
-2. Toggle "Enable RageScroll" to ON
+1. Click the RageBreak icon in your toolbar
+2. Toggle "Enable RageBreak" to ON
 3. Set your break interval (default: 5 minutes)
 4. Click "⚙️ Settings" to add websites
 5. Start browsing and take healthy breaks!

@@ -1,4 +1,4 @@
-# 🎮 RageScroll
+# 🎮 RageBreak
 
 A Chrome Extension (Manifest V3) that helps you take micro-breaks while browsing with fun mini-games.
 
@@ -27,18 +27,18 @@ A Chrome Extension (Manifest V3) that helps you take micro-breaks while browsing
 
 3. **Load the Extension**
    - Click "Load unpacked"
-   - Select the `RageScroll` folder
+   - Select the `RageBreak` folder
    - The extension icon should appear in your toolbar
 
 4. **Pin the Extension** (Optional)
    - Click the extensions puzzle icon in the toolbar
-   - Find RageScroll and click the pin icon
+   - Find RageBreak and click the pin icon
 
 ## Usage
 
 ### Quick Start
 
-1. **Click the RageScroll icon** in your toolbar
+1. **Click the RageBreak icon** in your toolbar
 2. **Enable the extension** using the toggle
 3. **Set your break interval** (default: 5 minutes)
 4. **Configure active websites** by clicking "⚙️ Settings"
@@ -111,7 +111,7 @@ View all shortcuts in Settings → Keyboard Shortcuts
 ## File Structure
 
 ```
-RageScroll/
+RageBreak/
 ├── manifest.json              # Extension configuration (Manifest V3)
 ├── src/
 │   ├── scripts/
