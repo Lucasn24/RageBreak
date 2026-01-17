@@ -17,16 +17,23 @@
     "videoCapture",
     "windows"
   ],
-  "host_permissions": [
-    "<all_urls>"
-  ],
+  "host_permissions": ["<all_urls>"],
   "background": {
     "service_worker": "src/scripts/service_worker.js"
   },
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["src/scripts/content_script.js", "src/scripts/notification.js"],
+      "js": [
+        "src/scripts/games/wordle.js",
+        "src/scripts/games/sudoku.js",
+        "src/scripts/games/memory.js",
+        "src/scripts/games/snake.js",
+        "src/scripts/games/math.js",
+        "src/scripts/games/webcam-overlay.js",
+        "src/scripts/content_script.js",
+        "src/scripts/notification.js"
+      ],
       "css": ["src/styles/overlay.css"],
       "run_at": "document_idle"
     }
