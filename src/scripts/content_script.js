@@ -154,6 +154,19 @@ function showBreakOverlay() {
   startAlarmSound();
   startFlyingStuff(overlay);
   startAnnoyances(overlay);
+  
+  // Add click listener to resume audio on any user interaction
+  const resumeAudio = () => {
+    if (alarmAudioContext && alarmAudioContext.state === 'suspended') {
+      alarmAudioContext.resume().then(() => {
+        console.log('RageBreak: Audio context resumed after user interaction');
+      }).catch(() => {});
+    }
+    overlay.removeEventListener('click', resumeAudio);
+    document.removeEventListener('keydown', resumeAudio);
+  };
+  overlay.addEventListener('click', resumeAudio);
+  document.addEventListener('keydown', resumeAudio);
 
   // Start the randomly selected game immediately
   const container = document.getElementById("ragebreak-game-container");
@@ -325,14 +338,25 @@ function stopFlyingStuff() {
   }
 }
 
-function startAlarmSound() {
+async function startAlarmSound() {
   if (alarmIntervalId) return;
   try {
     alarmAudioContext =
       alarmAudioContext ||
       new (window.AudioContext || window.webkitAudioContext)();
+    
+    // Resume AudioContext if suspended (required for autoplay policy)
+    if (alarmAudioContext.state === 'suspended') {
+      await alarmAudioContext.resume();
+    }
+    
     let toggle = false;
     const beep = () => {
+      // Check if context is running before playing
+      if (alarmAudioContext.state !== 'running') {
+        alarmAudioContext.resume().catch(() => {});
+      }
+      
       toggle = !toggle;
       const oscillator = alarmAudioContext.createOscillator();
       const gainNode = alarmAudioContext.createGain();
