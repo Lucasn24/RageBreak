@@ -1,4 +1,4 @@
-# RageScroll (RageBreak)
+# RageBreak
 
 RageScroll is a Manifest V3 Chrome extension that enforces micro‑breaks while you browse. When the timer hits, a fullscreen overlay appears and you must finish a mini‑game to continue scrolling. It is designed to be lightweight, fully offline, and configurable per website.
 
