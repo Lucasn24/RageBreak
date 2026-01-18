@@ -20,17 +20,17 @@ RageBreak is a Manifest V3 Chrome extension that enforces micro‑breaks while y
 
 ## Installation (Load Unpacked)
 
-1. Clone the repo in your local directory
+1. Clone the repo in your local directory.
 2. Open chrome://extensions/
-3. Enable Developer mode
-4. Click Load unpacked
-5. Select the RageScroll/RageBreak folder
-6. Pin the extension (optional)
+3. Enable Developer mode.
+4. Click Load unpacked and open the local folder that the repo is stored in.
+5. Select the RageScroll/RageBreak folder.
+6. Pin the extension (optional).
 
 ## Quick Start
 
 1. Click the extension icon to open the popup.
-2. Enable RageBreak. (Load unpacked and open the local folder) 
+2. Enable RageBreak.
 3. Choose your break interval.
 4. Add active websites in Settings (or use * for all sites).
 5. Browse — a break triggers after the interval and detected activity.
